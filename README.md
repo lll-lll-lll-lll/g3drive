@@ -1,4 +1,3 @@
-#### sdkに勝手に読み込んでもらうため
 ```sh
 export GOOGLE_APPLICATION_CREDENTIALS="./credentials.json"
 ```
@@ -7,6 +6,8 @@ export GOOGLE_APPLICATION_CREDENTIALS="./credentials.json"
 - ダウンロードしたファイルの管理が面倒
 - わざわざブラウザーを開いてまで、アップロードするのも面倒
 - コマンド1つでファイルをアップロードして欲しい。
+- Google Driveへのファイルのアップロードをコマンド一発で管理しようってやつ
+- 目的は並行処理の学習とアウトプット
 
 #### DONE
 - 特定のディレクトリ内にあるファイルを全てアップロードする
