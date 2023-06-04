@@ -13,3 +13,6 @@ export GOOGLE_APPLICATION_CREDENTIALS="./credentials.json"
 - 特定のディレクトリ内にあるファイルを全てアップロードする
 - 既にアップロードされているファイルはアップロードしない
 - ディレクトリがない場合は作成する
+
+サンプルのawsのPDFのリンク
+- https://andresriancho.com/wp-content/uploads/2019/06/whitepaper-internet-scale-analysis-of-aws-cognito-security.pdf
