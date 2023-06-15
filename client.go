@@ -10,7 +10,6 @@ import (
 	"google.golang.org/api/drive/v3"
 )
 
-// シェアしてるフォルダーID
 const QPath = " or '%s' in parents"
 
 type ClientDrive struct {
