@@ -8,7 +8,6 @@ import (
 
 type CustomMimeType int
 
-// ファイルのタイプを定義
 const (
 	DirMimeType CustomMimeType = iota + 1
 	DocMimeType
