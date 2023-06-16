@@ -39,7 +39,6 @@ type G3DFile struct {
 	MimeType      CustomMimeType
 }
 
-// 複数階層には対応していない
 func Parse(filePath string) (*G3DFile, error) {
 	if _, err := os.Stat(filePath); err != nil {
 		return nil, fmt.Errorf("%w", err)
