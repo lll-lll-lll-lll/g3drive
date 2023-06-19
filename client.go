@@ -78,7 +78,7 @@ func SetParentID(g3df *G3DFile, parentID string) *G3DFile {
 	return g3df
 }
 
-func SearchDirInList(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) {
+func SearchDirIDInList(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) {
 	var existed bool = true
 	for _, driveDir := range fileOrDir.Files {
 		if driveDir.MimeType == DirMimeType.String() && driveDir.Name == g3df.ParentDirName {
@@ -103,7 +103,7 @@ func Upload(ctx context.Context, client *ClientDrive, g3f *G3DFile) error {
 	if err != nil {
 		return err
 	}
-	dirID, ok := SearchDirInList(g3f, files)
+	dirID, ok := SearchDirIDInList(g3f, files)
 	if !ok {
 		dirRes, err := client.CreateDir(ctx, g3f)
 		if err != nil {
