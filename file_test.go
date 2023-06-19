@@ -3,7 +3,7 @@ package g3drive_test
 import (
 	"testing"
 
-	"github.com/lll-lll-lll/g3drive/g3drive"
+	"github.com/lll-lll-lll/g3drive"
 	"github.com/stretchr/testify/assert"
 )
 

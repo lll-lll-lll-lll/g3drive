@@ -6,7 +6,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/lll-lll-lll/g3drive/g3drive"
+	"github.com/lll-lll-lll/g3drive"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/drive/v3"
 )
