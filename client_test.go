@@ -16,7 +16,7 @@ func Test_SearchDirInList(t *testing.T) {
 	wantDirName := "test_dir"
 	g3df := g3drive.G3DFile{ParentDirName: wantDirName}
 	list := &drive.FileList{Files: []*drive.File{{MimeType: g3drive.DirMimeType.String(), Name: wantDirName}}}
-	_, ok := g3drive.SearchDirInList(&g3df, list)
+	_, ok := g3drive.SearchDirIDInList(&g3df, list)
 	if !ok {
 		t.Log("File not Exist in Drive")
 	}

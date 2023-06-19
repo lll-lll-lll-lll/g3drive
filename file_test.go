@@ -9,8 +9,8 @@ import (
 
 func Test_Parse_PDF(t *testing.T) {
 	t.Parallel()
-	fileName := "a/b/file1.pdf"
+	fileName := "Drive/aws/aws-cognito-security.pdf"
 	f, _ := g3drive.Parse(fileName)
-	assert.Equal(t, "b", f.ParentDirName)
-	assert.Equal(t, "file1.pdf", f.Name)
+	assert.Equal(t, "aws", f.ParentDirName)
+	assert.Equal(t, "aws-cognito-security.pdf", f.Name)
 }
