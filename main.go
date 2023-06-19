@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/lll-lll-lll/g3drive"
+	"github.com/lll-lll-lll/g3drive/g3drive"
 	"google.golang.org/api/drive/v3"
 )
 
