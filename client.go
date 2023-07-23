@@ -116,7 +116,7 @@ func Upload(ctx context.Context, client *ClientDrive, g3f *G3DFile) error {
 	if err != nil {
 		return err
 	}
-	// ok is true. file exist
+	// if ok is true, file already existed
 	if _, ok = SearchFileIDInList(g3f, filesDir); ok {
 		log.Println("same file name existed")
 		return err
