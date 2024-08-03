@@ -29,9 +29,11 @@ func main() {
 func run(ctx context.Context, fileNames []string) error {
 	var wg sync.WaitGroup
 	wg.Add(len(fileNames))
+	errc := make(chan error, len(fileNames))
+
 	srv, err := drive.NewService(ctx)
 	if err != nil {
-		return fmt.Errorf("Unable to retrieve Drive client: %v", err)
+		return fmt.Errorf("Unable to retrieve Drive client: %w", err)
 	}
 	client := g3drive.New(srv)
 	for _, fileName := range fileNames {
@@ -40,15 +42,21 @@ func run(ctx context.Context, fileNames []string) error {
 			defer wg.Done()
 			g3f, err := g3drive.Parse(fileName)
 			if err != nil {
+				errc <- fmt.Errorf("Failed to parse file %s: %w", fileName, err)
 				return fmt.Errorf("%w", err)
 			}
 			if err := g3drive.Upload(ctx, client, g3f); err != nil {
+				errc <- fmt.Errorf("Failed to upload file %s: %w", fileName, err)
+
 				return fmt.Errorf("%w", err)
 			}
 			return nil
 		}(fileName)
 	}
 	wg.Wait()
-
+	close(errc)
+	if len(errc) > 0 {
+		return <-errc
+	}
 	return nil
 }
