@@ -1,6 +1,7 @@
 package g3drive
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -45,21 +46,21 @@ func Parse(filePath string) (*G3DFile, error) {
 	_, fileName := filepath.Split(filePath)
 	_, parentDirName := filepath.Split(filepath.Dir(filePath))
 	ext := filepath.Ext(filePath)
-	mimeType, err := parseMimeType(ext)
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+	mimeType := parseMimeType(ext)
+	if mimeType == 0 {
+		return nil, errors.New("failed to parse mime type")
 	}
 	return &G3DFile{Ext: ext, Name: fileName, path: filePath, ParentDirName: parentDirName, MimeType: mimeType}, nil
 }
 
-func parseMimeType(ext string) (CustomMimeType, error) {
+func parseMimeType(ext string) CustomMimeType {
 	switch ext {
 	case ".pdf":
-		return PDFMimeType, nil
+		return PDFMimeType
 	case ".txt":
-		return TextPlainMimeType, nil
+		return TextPlainMimeType
 	case ".doc":
-		return DocMimeType, nil
+		return DocMimeType
 	}
-	return 0, nil
+	return 0
 }
