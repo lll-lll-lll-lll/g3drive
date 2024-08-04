@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type CustomMimeType int
@@ -51,6 +52,20 @@ func Parse(filePath string) (*G3DFile, error) {
 		return nil, errors.New("failed to parse mime type")
 	}
 	return &G3DFile{Ext: ext, Name: fileName, path: filePath, ParentDirName: parentDirName, MimeType: mimeType}, nil
+}
+
+// ValidateSecurityFile is 機密性が高いと思われるファイルやディレクトリ、.で始まるファイルをアップロードしないようにする
+func ValidateSecurityFile(filePath string) error {
+	const MAX_FILE_SIZE_100MB int64 = 100 * 1024 * 1024
+	finfo, _ := os.Stat(filePath)
+	if finfo.Size() > MAX_FILE_SIZE_100MB {
+		return errors.New("failed to upload file over")
+	}
+	_, fileName := filepath.Split(filePath)
+	if strings.HasPrefix(fileName, ".") {
+		return errors.New("failed to upload dot file")
+	}
+	return nil
 }
 
 func parseMimeType(ext string) CustomMimeType {

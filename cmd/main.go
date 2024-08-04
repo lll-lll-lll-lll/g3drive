@@ -46,6 +46,9 @@ func run(ctx context.Context, fileNames []string) error {
 				errc <- fmt.Errorf("Failed to parse file %s: %w", fileName, err)
 				return fmt.Errorf("%w", err)
 			}
+			if err := g3drive.ValidateSecurityFile(fileName); err != nil {
+				return fmt.Errorf("failed to validate file type. %w", err)
+			}
 			if err := g3drive.Upload(ctx, client, g3f, driveFolderID); err != nil {
 				errc <- fmt.Errorf("Failed to upload file %s: %w", fileName, err)
 
