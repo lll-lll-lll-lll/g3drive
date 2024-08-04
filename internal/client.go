@@ -23,7 +23,7 @@ func New(srv *drive.Service) *ClientDrive {
 func (cd *ClientDrive) UploadFile(ctx context.Context, g3dFile *G3DFile) (*drive.File, error) {
 	targetFile, err := os.Open(g3dFile.path)
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("failed to open file. %w", err)
 	}
 	defer targetFile.Close()
 	res, err := cd.service.Files.
@@ -32,12 +32,12 @@ func (cd *ClientDrive) UploadFile(ctx context.Context, g3dFile *G3DFile) (*drive
 		Context(ctx).
 		Do()
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("failed to create file. %w", err)
 	}
 	return res, nil
 }
 
-func (cd *ClientDrive) CreateDir(ctx context.Context, g3df *G3DFile) (*drive.File, error) {
+func (cd *ClientDrive) MakeDir(ctx context.Context, g3df *G3DFile) (*drive.File, error) {
 	res, err := cd.service.Files.
 		Create(&drive.File{Name: g3df.ParentDirName, Parents: []string{g3df.ParentDirID}, MimeType: DirMimeType.String()}).
 		Context(ctx).
@@ -49,11 +49,10 @@ func (cd *ClientDrive) CreateDir(ctx context.Context, g3df *G3DFile) (*drive.Fil
 }
 
 // if targetDirIDs is number of zero, default is 'DriveFolderID'
-func (cd *ClientDrive) Search(ctx context.Context, targetDirIDs []string) (*drive.FileList, error) {
-	DriveFolderID := os.Getenv("DRIVE_FOLDER_ID")
+func (cd *ClientDrive) Find(ctx context.Context, driveForlderID string, targetDirIDs []string) (*drive.FileList, error) {
 	var targetDirIDsForQ = make([]string, len(targetDirIDs))
 	if len(targetDirIDs) == 0 {
-		targetDirIDs = []string{DriveFolderID}
+		targetDirIDs = []string{driveForlderID}
 	}
 	for i, tdid := range targetDirIDs {
 		if i == 0 {
@@ -73,12 +72,12 @@ func (cd *ClientDrive) Search(ctx context.Context, targetDirIDs []string) (*driv
 	return files, nil
 }
 
-func SetParentID(g3df *G3DFile, parentID string) *G3DFile {
+func setParentDirID(g3df *G3DFile, parentID string) *G3DFile {
 	g3df.ParentDirID = parentID
 	return g3df
 }
 
-func SearchDirIDInList(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) {
+func findDirID(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) {
 	var existed bool = true
 	for _, driveDir := range fileOrDir.Files {
 		if driveDir.MimeType == DirMimeType.String() && driveDir.Name == g3df.ParentDirName {
@@ -88,36 +87,38 @@ func SearchDirIDInList(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) 
 	return "", !existed
 }
 
-func SearchFileIDInList(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) {
-	var existed bool = true
+// findFileID if file existed in fileOrDir, return fileID, true
+func findFileID(g3df *G3DFile, fileOrDir *drive.FileList) (string, bool) {
 	for _, file := range fileOrDir.Files {
 		if file.MimeType == g3df.MimeType.String() && file.Name == g3df.Name {
-			return file.Id, existed
+			return file.Id, true
 		}
 	}
-	return "", !existed
+	return "", false
 }
 
-func Upload(ctx context.Context, client *ClientDrive, g3f *G3DFile) error {
-	files, err := client.Search(ctx, nil)
+func Upload(ctx context.Context, client *ClientDrive, g3f *G3DFile, driveFolderID string) error {
+	files, err := client.Find(ctx, driveFolderID, nil)
 	if err != nil {
 		return err
 	}
-	dirID, ok := SearchDirIDInList(g3f, files)
+	var dirID string
+	var ok bool
+	dirID, ok = findDirID(g3f, files)
 	if !ok {
-		dirRes, err := client.CreateDir(ctx, g3f)
+		dirRes, err := client.MakeDir(ctx, g3f)
 		if err != nil {
 			return err
 		}
 		dirID = dirRes.Id
 	}
-	g3f = SetParentID(g3f, dirID)
-	filesDir, err := client.Search(ctx, []string{dirID})
+	g3f = setParentDirID(g3f, dirID)
+	filesDir, err := client.Find(ctx, driveFolderID, []string{dirID})
 	if err != nil {
 		return err
 	}
 	// if ok is true, file already existed
-	if _, ok = SearchFileIDInList(g3f, filesDir); ok {
+	if _, ok = findFileID(g3f, filesDir); ok {
 		log.Println("same file name existed")
 		return err
 	}

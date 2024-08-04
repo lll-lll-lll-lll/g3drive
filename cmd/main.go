@@ -27,6 +27,7 @@ func main() {
 }
 
 func run(ctx context.Context, fileNames []string) error {
+	driveFolderID := os.Getenv("DRIVE_FOLDER_ID")
 	var wg sync.WaitGroup
 	wg.Add(len(fileNames))
 	errc := make(chan error, len(fileNames))
@@ -45,7 +46,7 @@ func run(ctx context.Context, fileNames []string) error {
 				errc <- fmt.Errorf("Failed to parse file %s: %w", fileName, err)
 				return fmt.Errorf("%w", err)
 			}
-			if err := g3drive.Upload(ctx, client, g3f); err != nil {
+			if err := g3drive.Upload(ctx, client, g3f, driveFolderID); err != nil {
 				errc <- fmt.Errorf("Failed to upload file %s: %w", fileName, err)
 
 				return fmt.Errorf("%w", err)
